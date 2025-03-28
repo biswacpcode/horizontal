@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Effect Of Boundary on Horizontally Polarised Waves</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        cursor: crosshair;
+      }
+
+      body {
+        background: repeating-linear-gradient(
+          90deg,
+          #0a2e0a 0px,
+          #0a2e0a 50px,
+          #164016 50px,
+          #164016 100px
+        );
+        color: #ffd700;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .mouse-follower {
+        width: 30px;
+        height: 30px;
+        background: #cc0000;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.5);
+      }
+
+      .top-section {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        padding: 20px;
+        background: rgba(10, 46, 10, 0.9);
+      }
+
+      .title {
+        color: #ffd700;
+        font-size: 2.5rem;
+        font-family: "Orbitron", sans-serif;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+      }
+
+      .simulate-btn {
+        padding: 10px 30px;
+        font-size: 1.8rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: #ffd700;
+        border: 2px solid #ffd700;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: "Orbitron", sans-serif;
+        letter-spacing: 3px;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        display: block;
+        margin: 0;
+      }
+
+      .simulate-btn:hover {
+        background: rgba(255, 215, 0, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+      }
+
+      .boundary-line {
+        height: 8px;
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: repeating-linear-gradient(
+          to right,
+          #ff0000 0px,
+          #ff0000 100px,
+          #ffffff 100px,
+          #ffffff 200px
+        );
+      }
+
+      .banner-container {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 100px;
+        margin-top: 100px;
+      }
+
+      .quote-container {
+        flex: 1;
+        max-width: 50%;
+        padding-right: 50px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+        margin-right: 450px;
+      }
+
+      .quote {
+        font-size: 4rem;
+        font-weight: bold;
+        opacity: 0;
+        position: absolute;
+        transition: opacity 0.5s ease;
+        text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000,
+          -1px 1px 0 #000, 1px 1px 0 #000;
+        font-family: "Playfair Display", serif;
+        line-height: 1.4;
+      }
+
+      .quote.active {
+        opacity: 1;
+        position: relative;
+      }
+
+      .quote span {
+        opacity: 0;
+        display: inline-block;
+        transition: opacity 0.3s ease;
+      }
+
+      .circle-banner {
+        width: 450px;
+        height: 450px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        position: fixed;
+        right: 100px;
+        top: 100px;
+        transform: none;
+        z-index: 10;
+      }
+
+      .circle-banner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .team-section {
+        padding: 100px 0;
+        background: rgba(0, 0, 0, 0.8);
+        margin-top: 100vh;
+        position: relative;
+        z-index: 20;
+      }
+
+      .team-heading {
+        text-align: center;
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.5rem;
+        color: #ffd700;
+        margin-bottom: 50px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .team-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .team-member {
+        width: 300px;
+        background: rgba(10, 46, 10, 0.9);
+        border: 2px solid #ffd700;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .team-member:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+      }
+
+      .member-image {
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+      }
+
+      .member-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .team-member:hover .member-image img {
+        transform: scale(1.1);
+      }
+
+      .member-info {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .member-info h3 {
+        font-family: "Playfair Display", serif;
+        color: #ffd700;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .member-info p {
+        color: #fff;
+        font-size: 1rem;
+        opacity: 0.9;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+      }
+
+      @media (max-width: 1024px) {
+        .team-container {
+          gap: 20px;
+        }
+
+        .team-member {
+          width: 280px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .team-member {
+          width: 100%;
+          max-width: 350px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mouse-follower"></div>
+
+    <div class="top-section">
+      <div
+        style="
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          gap: 50px;
+        "
+      >
+        <button class="simulate-btn">LET'S SIMULATE</button>
+        <h1 class="title">Sachin Ramesh Tendulkar</h1>
+      </div>
+      <div class="boundary-line"></div>
+    </div>
+
+    <div class="banner-container">
+      <div class="quote-container">
+        <div class="quote active" id="quote1">
+          <span>"</span><span>I</span> <span>have</span> <span>seen</span>
+          <span>God,</span> <span>He</span> <span>bats</span> <span>at</span>
+          <span>number</span> <span>4</span> <span>for</span> <span>India</span
+          ><span>"</span>
+        </div>
+        <div class="quote" id="quote2">
+          <span>"</span><span>I</span> <span>have</span> <span>seen</span>
+          <span>horizontally</span> <span>polarised</span> <span>waves</span>
+          <span>at</span> <span>dielectric</span> <span>boundaries,</span>
+          <span>they</span> <span>are</span> <span>in</span> <span>the</span>
+          <span>Let's</span> <span>simulate</span> <span>button</span>
+          <span>above</span><span>"</span>
+        </div>
+      </div>
+      <div class="circle-banner">
+        <img src="images/banner.jpg" alt="EM Field Simulation Banner" />
+      </div>
+    </div>
+
+    <section class="team-section">
+      <h2 class="team-heading">Our Team</h2>
+      <div class="team-container">
+        <div class="team-member">
+          <div class="member-image">
+            <img src="images/member1.jpg" alt="Oamsi" />
+          </div>
+          <div class="member-info">
+            <h3>Vamsi</h3>
+            <p>Opening EWRS Engineer</p>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-image">
+            <img src="images/member2.jpg" alt="Aditya" />
+          </div>
+          <div class="member-info">
+            <h3>Aditya</h3>
+            <p>Right Arm Swing Coder</p>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-image">
+            <img src="images/member3.jpg" alt="Mohith" />
+          </div>
+          <div class="member-info">
+            <h3>Mohith</h3>
+            <p>Debugging All Rounder</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // Mouse follower
+      const mouseFollower = document.querySelector(".mouse-follower");
+      document.addEventListener("mousemove", (e) => {
+        mouseFollower.style.left = e.clientX + "px";
+        mouseFollower.style.top = e.clientY + "px";
+      });
+
+      // Quote animation
+      const quotes = [
+        document.getElementById("quote1"),
+        document.getElementById("quote2"),
+      ];
+      let currentQuote = 0;
+
+      async function animateQuote(quote) {
+        const words = quote.querySelectorAll("span");
+        for (let word of words) {
+          word.style.opacity = "1";
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+
+      async function toggleQuote() {
+        quotes[currentQuote].classList.remove("active");
+        currentQuote = (currentQuote + 1) % quotes.length;
+        const nextQuote = quotes[currentQuote];
+
+        nextQuote.querySelectorAll("span").forEach((span) => {
+          span.style.opacity = "0";
+        });
+
+        nextQuote.classList.add("active");
+        await animateQuote(nextQuote);
+
+        setTimeout(toggleQuote, 2000);
+      }
+
+      // Start the animation
+      toggleQuote();
+
+      // Button click handler
+      document.querySelector(".simulate-btn").addEventListener("click", () => {
+        window.location.href = "simulation.html";
+      });
+    </script>
+  </body>
+</html>
